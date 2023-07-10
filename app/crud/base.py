@@ -11,12 +11,17 @@ class CRUDBase:
     def __init__(self, model):
         self.model = model
 
-    async def get_multi(
+    async def get(
             self,
-            session: AsyncSession
+            obj_id: int,
+            session: AsyncSession,
     ):
-        db_objs = await session.execute(select(self.model))
-        return db_objs.scalars().all()
+        get_obj_in_db = await session.execute(
+            select(self.model).where(
+                self.model.id == obj_id
+            )
+        )
+        return get_obj_in_db.scalars().first()
 
     async def create(
             self,
