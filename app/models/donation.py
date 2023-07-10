@@ -1,7 +1,7 @@
 from sqlalchemy import Column, Text
 
-from app.core.db import Base
+from app.core.db import AbstractBase
 
 
-class Donation(Base):
+class Donation(AbstractBase):
     comment = Column(Text, nullable=True)

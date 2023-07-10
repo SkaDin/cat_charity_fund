@@ -8,16 +8,12 @@ from app.core.config import settings
 
 
 class PreBase:
+    """Настройка для всех моделей."""
+
     @declared_attr
     def __tablename__(cls):  # noqa
         return cls.__name__.lower()
     id = Column(Integer, primary_key=True)
-    name = Column(String(100), unique=True, nullable=False)
-    full_amount = Column(Integer)  # поле требуемой суммы
-    invested_amount = Column(Integer, default=0)  # поле внесённой суммы
-    fully_invested = Column(Boolean, default=False)
-    create_date = Column(DateTime, default=datetime.utcnow)
-    close_date = Column(DateTime)
 
 
 Base = declarative_base(cls=PreBase)
@@ -31,3 +27,14 @@ async def get_async_session():
     """Функция-генератор асинхронных сессий."""
     async with AsyncSessionLocal() as async_session:
         yield async_session
+
+
+class AbstractBase(Base):
+    """Базовый абстрактный класс."""
+
+    __abstract__ = True
+    full_amount = Column(Integer, default=0)  # поле требуемой суммы
+    invested_amount = Column(Integer, default=0)  # поле внесённой суммы
+    fully_invested = Column(Boolean, default=False)
+    create_date = Column(DateTime, default=datetime.utcnow)
+    close_date = Column(DateTime)
