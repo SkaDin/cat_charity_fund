@@ -1,8 +1,7 @@
 from sqlalchemy import Column, Text
 
-from app.core.db import Base, BaseAbstract
+from app.core.db import Base
 
 
-class CharityProject(Base, BaseAbstract):
+class CharityProject(Base):
     description = Column(Text, nullable=False)
-
