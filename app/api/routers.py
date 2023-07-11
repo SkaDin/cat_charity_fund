@@ -1,6 +1,7 @@
 from fastapi import APIRouter
 
-from app.api.endpoints import (charity_project_router)
+from app.api.endpoints import (charity_project_router,
+                               user_router)
 
 
 main_router = APIRouter()
@@ -14,3 +15,5 @@ main_router.include_router(
 #     prefix='/reservation',
 #     tags=['Reservations'],
 # )
+
+main_router.include_router(user_router)

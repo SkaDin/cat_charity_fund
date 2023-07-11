@@ -4,12 +4,11 @@ from typing import Optional
 from pydantic import BaseModel, Field, PositiveInt, validator
 
 
-class CharityProjectCreate(BaseModel):
+class CharityProjectBase(BaseModel):
     name: str = Field(
         ...,
         min_length=1,
         max_length=100,
-        description='Имя проекта'
     )
     description: str = Field(
         ...,
@@ -17,11 +16,17 @@ class CharityProjectCreate(BaseModel):
     )
     full_amount: PositiveInt
 
+
+class CharityProjectCreate(CharityProjectBase):
     @validator('name')
     def validate_name(cls, value): # noqa
         if not value:
             raise ValueError('Имя не может быть пустым')
         return value
+
+
+class CharityProjectUpdate(CharityProjectBase):
+    pass
 
 
 class CharityProjectDB(CharityProjectCreate):

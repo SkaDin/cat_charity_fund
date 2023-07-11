@@ -1,7 +1,7 @@
 from pydantic import BaseSettings
 
 
-class Setting(BaseSettings):
+class Settings(BaseSettings):
     """Класс настроек Pydanctic."""
     app_title: str = 'Кошачьи делишки'
     description: str = 'Фонд помощи усатым'
@@ -12,4 +12,4 @@ class Setting(BaseSettings):
         env_file = '.env'
 
 
-settings = Setting()
+settings = Settings()

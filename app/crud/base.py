@@ -3,10 +3,9 @@ from fastapi.encoders import jsonable_encoder
 from sqlalchemy import select
 from sqlalchemy.ext.asyncio import AsyncSession
 
-from app.models.charity_project import CharityProject
-
 
 class CRUDBase:
+    """Базовый класс для базовых CRUD-операций."""
 
     def __init__(self, model):
         self.model = model
@@ -16,6 +15,7 @@ class CRUDBase:
             obj_id: int,
             session: AsyncSession,
     ):
+        """Получение объекта."""
         get_obj_in_db = await session.execute(
             select(self.model).where(
                 self.model.id == obj_id
@@ -28,6 +28,7 @@ class CRUDBase:
             obj_in,
             session: AsyncSession,
     ):
+        """Создание объекта."""
         obj_in_data = obj_in.dict()
         db_obj = self.model(**obj_in_data)
         session.add(db_obj)
@@ -41,6 +42,7 @@ class CRUDBase:
             obj_in,
             session: AsyncSession,
     ):
+        """Обновление объекта."""
         obj_data = jsonable_encoder(db_obj)
         update_data = obj_in.dict(exclude_unset=True)
 
@@ -57,6 +59,7 @@ class CRUDBase:
             db_obj,
             session: AsyncSession,
     ):
+        """Удаление объекта."""
         await session.delete(db_obj)
         await session.commit()
         return db_obj
