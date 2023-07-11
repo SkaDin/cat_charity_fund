@@ -23,6 +23,14 @@ class CRUDBase:
         )
         return get_obj_in_db.scalars().first()
 
+    async def get_multi(
+            self,
+            session: AsyncSession
+    ):
+        """Получение всех объектов."""
+        db_obj_all = await session.execute(select(self.model))
+        return db_obj_all.scalars().all()
+
     async def create(
             self,
             obj_in,

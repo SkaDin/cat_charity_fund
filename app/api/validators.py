@@ -19,7 +19,7 @@ async def check_name_duplicate(
         raise HTTPException(
             status_code=HTTPStatus.UNPROCESSABLE_ENTITY,
             detail=f'Проект с таким названием:'
-                   f'{charity_project_name} уже существует!'
+                   f'"{charity_project_name}" уже существует!'
         )
 
 

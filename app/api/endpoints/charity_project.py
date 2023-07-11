@@ -1,7 +1,9 @@
+from typing import List
+
 from fastapi import APIRouter, Depends
 from sqlalchemy.ext.asyncio import AsyncSession
 
-from app.api.validators import check_charity_project_exists
+from app.api.validators import check_charity_project_exists, check_name_duplicate
 from app.core.db import get_async_session
 from app.crud.charity_project import charity_project_crud
 from app.schemas.charity_project import (CharityProjectCreate,
@@ -13,12 +15,17 @@ router = APIRouter()
 
 @router.post(
     '/',
-    response_model=CharityProjectDB
+    response_model=CharityProjectDB,
+    response_model_exclude_none=True
 )
 async def create_new_charity_project(
         charity: CharityProjectCreate,
         session: AsyncSession = Depends(get_async_session)
 ):
+    await check_name_duplicate(
+        charity.name,
+        session
+    )
     new_charity_project = await charity_project_crud.create(
         charity,
         session
@@ -27,22 +34,17 @@ async def create_new_charity_project(
 
 
 @router.get(
-    '/{charity_project_id}',
-    response_model=CharityProjectDB
+    '/',
+    response_model=List[CharityProjectDB],
+    response_model_exclude_none=True
 )
-async def get_charity_project(
-        charity_id: int,
+async def get_all_charity_project(
         session: AsyncSession = Depends(get_async_session)
 ):
-    await check_charity_project_exists(
-        charity_id,
+    charity_project_all = await charity_project_crud.get_multi(
         session
     )
-    charity_project = await charity_project_crud.get(
-        charity_id,
-        session
-    )
-    return charity_project
+    return charity_project_all
 
 
 @router.delete(
