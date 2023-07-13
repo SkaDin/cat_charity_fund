@@ -1,16 +1,18 @@
 from http import HTTPStatus
 from typing import List
 
-from fastapi import APIRouter, Depends
+from fastapi import APIRouter, Depends, HTTPException
 from sqlalchemy.ext.asyncio import AsyncSession
 
-from app.api.validators import check_charity_project_exists, check_name_duplicate
+from app.api.validators import check_charity_project_exists, check_name_duplicate, check_project_close
 from app.core.db import get_async_session
 from app.core.user import current_superuser
 from app.crud.charity_project import charity_project_crud
+from app.models import CharityProject, Donation
 from app.schemas.charity_project import (CharityProjectCreate,
                                          CharityProjectDB,
                                          CharityProjectUpdate)
+from app.services.investment import investments
 
 router = APIRouter()
 
@@ -51,7 +53,7 @@ async def get_all_charity_project(
 
 
 @router.delete(
-    '/{charity_project_id}',
+    '/{project_id}',
     response_model=CharityProjectDB,
     dependencies=[Depends(current_superuser)]
 )
@@ -63,6 +65,7 @@ async def delete_charity_project(
         charity_id,
         session
     )
+    await check_project_close(charity_project)
     charity_project_delete = await charity_project_crud.remove(
         charity_project,
         session
@@ -71,7 +74,7 @@ async def delete_charity_project(
 
 
 @router.patch(
-    '/{charity_project_id}',
+    '/{project_id}',
     response_model=CharityProjectDB,
     dependencies=[Depends(current_superuser)]
 )
@@ -84,9 +87,14 @@ async def update_charity_project(
         charity_id,
         session
     )
+    if obj_in.name is not None:
+        await check_name_duplicate(
+            obj_in.name,
+            session
+        )
     charity_project_update = await charity_project_crud.update(
         charity_project,
         obj_in,
         session
     )
-    return charity_project_update, HTTPStatus.OK
+    return charity_project_update, HTTPStatus.BAD_REQUEST

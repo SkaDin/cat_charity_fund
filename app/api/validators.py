@@ -17,15 +17,14 @@ async def check_name_duplicate(
     )
     if charity_id is not None:
         raise HTTPException(
-            status_code=HTTPStatus.UNPROCESSABLE_ENTITY,
-            detail=f'Проект с таким названием:'
-                   f'"{charity_project_name}" уже существует!'
+            status_code=HTTPStatus.BAD_REQUEST,
+            detail='Проект с таким именем уже существует!'
         )
 
 
 async def check_charity_project_exists(
         charity_project_id: int,
-        session: AsyncSession
+        session: AsyncSession,
 ) -> CharityProject:
     """
     Проверяет, существует ли проект с указанным ID.
@@ -42,8 +41,14 @@ async def check_charity_project_exists(
     return charity_project
 
 
-# async def check_charity_project_intersection(**kwargs) -> None:
-#     charity_project =
+async def check_project_close(
+        project: CharityProject
+):
+    if project.fully_invested is True:
+        raise HTTPException(
+            status_code=HTTPStatus.BAD_REQUEST,
+            detail='Удаление закрытых проектов - запрещено!'
+        )
 
 
 async def check_charity_before_edit(

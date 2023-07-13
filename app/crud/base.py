@@ -1,4 +1,3 @@
-
 from fastapi.encoders import jsonable_encoder
 from sqlalchemy import select
 from sqlalchemy.ext.asyncio import AsyncSession
@@ -34,7 +33,7 @@ class CRUDBase:
     async def create(
             self,
             obj_in,
-            session: AsyncSession,
+            session: AsyncSession
     ):
         """Создание объекта."""
         obj_in_data = jsonable_encoder(obj_in)
@@ -53,7 +52,6 @@ class CRUDBase:
         """Обновление объекта."""
         obj_data = jsonable_encoder(db_obj)
         update_data = obj_in.dict(exclude_unset=True)
-
         for field in obj_data:
             if field in update_data:
                 setattr(db_obj, field, update_data[field])

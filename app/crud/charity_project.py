@@ -21,5 +21,10 @@ class CRUDCharityProject(CRUDBase):
         )
         return charity_project.scalars().first()
 
+    # async def update_charity_project_same_name(
+    #         self,
+    #
+    # ):
+
 
 charity_project_crud = CRUDCharityProject(CharityProject)

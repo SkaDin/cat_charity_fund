@@ -20,7 +20,7 @@ class DonationUserDB(DonationCreate):
         orm_mode = True
 
 
-class DonationSuperuserDB(DonationCreate):
+class DonationSuperuserDB(DonationUserDB):
     user_id: Optional[int]
     invested_amount: int
     fully_invested: bool = False
