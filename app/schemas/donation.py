@@ -20,9 +20,9 @@ class DonationUserDB(DonationCreate):
         orm_mode = True
 
 
-class DonationSuperuserDB(DonationBase):
+class DonationSuperuserDB(DonationCreate):
     user_id: Optional[int]
-    invested_amount: int = 0
+    invested_amount: int
     fully_invested: bool = False
     close_date: datetime = None
 

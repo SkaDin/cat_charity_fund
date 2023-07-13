@@ -1,3 +1,4 @@
+from http import HTTPStatus
 from typing import List
 
 from fastapi import APIRouter, Depends
@@ -5,6 +6,7 @@ from sqlalchemy.ext.asyncio import AsyncSession
 
 from app.api.validators import check_charity_project_exists, check_name_duplicate
 from app.core.db import get_async_session
+from app.core.user import current_superuser
 from app.crud.charity_project import charity_project_crud
 from app.schemas.charity_project import (CharityProjectCreate,
                                          CharityProjectDB,
@@ -16,7 +18,8 @@ router = APIRouter()
 @router.post(
     '/',
     response_model=CharityProjectDB,
-    response_model_exclude_none=True
+    response_model_exclude_none=True,
+    dependencies=[Depends(current_superuser)]
 )
 async def create_new_charity_project(
         charity: CharityProjectCreate,
@@ -49,7 +52,8 @@ async def get_all_charity_project(
 
 @router.delete(
     '/{charity_project_id}',
-    response_model=CharityProjectDB
+    response_model=CharityProjectDB,
+    dependencies=[Depends(current_superuser)]
 )
 async def delete_charity_project(
         charity_id: int,
@@ -63,12 +67,13 @@ async def delete_charity_project(
         charity_project,
         session
     )
-    return charity_project_delete
+    return charity_project_delete, HTTPStatus.OK
 
 
 @router.patch(
     '/{charity_project_id}',
     response_model=CharityProjectDB,
+    dependencies=[Depends(current_superuser)]
 )
 async def update_charity_project(
         charity_id: int,
@@ -84,4 +89,4 @@ async def update_charity_project(
         obj_in,
         session
     )
-    return charity_project_update
+    return charity_project_update, HTTPStatus.OK
