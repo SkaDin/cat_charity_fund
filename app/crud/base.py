@@ -1,4 +1,4 @@
-from typing import Optional
+
 from fastapi.encoders import jsonable_encoder
 from sqlalchemy import select
 from sqlalchemy.ext.asyncio import AsyncSession
@@ -37,7 +37,7 @@ class CRUDBase:
             session: AsyncSession,
     ):
         """Создание объекта."""
-        obj_in_data = obj_in.dict()
+        obj_in_data = jsonable_encoder(obj_in)
         db_obj = self.model(**obj_in_data)
         session.add(db_obj)
         await session.commit()

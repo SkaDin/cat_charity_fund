@@ -1,5 +1,4 @@
 from datetime import datetime
-from typing import Optional
 
 from pydantic import BaseModel, Field, PositiveInt, validator
 
@@ -21,7 +20,7 @@ class CharityProjectCreate(CharityProjectBase):
     @validator('name')
     def validate_name(cls, value): # noqa
         if not value:
-            raise ValueError('Имя не может быть пустым')
+            raise ValueError('Имя не может быть пустым!')
         return value
 
 
