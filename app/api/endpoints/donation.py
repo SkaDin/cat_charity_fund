@@ -9,7 +9,7 @@ from app.core.user import current_superuser, current_user
 from app.crud.donation import donation_crud
 from app.models import User, CharityProject
 from app.schemas.donation import DonationUserDB, DonationCreate, DonationSuperuserDB
-from app.services.investment import investments
+from app.services.investment import investment
 
 router = APIRouter()
 
@@ -29,6 +29,11 @@ async def create_donation(
         donation,
         session,
         user
+    )
+    await investment(
+        new_donation,
+        CharityProject,
+        session
     )
     return new_donation
 

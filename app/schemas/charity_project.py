@@ -28,7 +28,7 @@ class CharityProjectUpdate(CharityProjectBase):
     pass
 
 
-class CharityProjectDB(CharityProjectCreate):
+class CharityProjectDB(CharityProjectBase):
     id: int
     invested_amount: int = 0
     fully_invested: bool = False

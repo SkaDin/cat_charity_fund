@@ -4,7 +4,7 @@ from typing import List
 from fastapi import APIRouter, Depends, HTTPException
 from sqlalchemy.ext.asyncio import AsyncSession
 
-from app.api.validators import check_charity_project_exists, check_name_duplicate, check_project_close
+from app.api.validators import check_charity_project_exists, check_name_duplicate, delete_charity_project
 from app.core.db import get_async_session
 from app.core.user import current_superuser
 from app.crud.charity_project import charity_project_crud
@@ -12,7 +12,8 @@ from app.models import CharityProject, Donation
 from app.schemas.charity_project import (CharityProjectCreate,
                                          CharityProjectDB,
                                          CharityProjectUpdate)
-from app.services.investment import investments
+from app.schemas.donation import DonationCreate
+from app.services.investment import investment
 
 router = APIRouter()
 
@@ -35,6 +36,11 @@ async def create_new_charity_project(
         charity,
         session
     )
+    await investment(
+        new_charity_project,
+        Donation,
+        session
+    )
     return new_charity_project
 
 
@@ -53,38 +59,40 @@ async def get_all_charity_project(
 
 
 @router.delete(
-    '/{project_id}',
+    '/{charity_project_id}',
     response_model=CharityProjectDB,
-    dependencies=[Depends(current_superuser)]
+    dependencies=[Depends(current_superuser)],
+
 )
-async def delete_charity_project(
-        charity_id: int,
+async def delete_charity_projects(
+        charity_project_id: int,
         session: AsyncSession = Depends(get_async_session)
 ):
     charity_project = await check_charity_project_exists(
-        charity_id,
+        charity_project_id,
         session
     )
-    await check_project_close(charity_project)
+    await delete_charity_project(charity_project)
     charity_project_delete = await charity_project_crud.remove(
         charity_project,
         session
     )
-    return charity_project_delete, HTTPStatus.OK
+    return charity_project_delete
 
 
 @router.patch(
-    '/{project_id}',
+    '/{charity_project_id}',
     response_model=CharityProjectDB,
-    dependencies=[Depends(current_superuser)]
+    dependencies=[Depends(current_superuser)],
+    response_model_exclude_none=True
 )
 async def update_charity_project(
-        charity_id: int,
+        charity_project_id: int,
         obj_in: CharityProjectUpdate,
         session: AsyncSession = Depends(get_async_session)
 ):
     charity_project = await check_charity_project_exists(
-        charity_id,
+        charity_project_id,
         session
     )
     if obj_in.name is not None:
@@ -97,4 +105,5 @@ async def update_charity_project(
         obj_in,
         session
     )
-    return charity_project_update, HTTPStatus.BAD_REQUEST
+
+    return charity_project_update
