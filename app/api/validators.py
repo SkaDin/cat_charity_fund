@@ -70,8 +70,8 @@ async def check_invested_before_edit(
     project_request: CharityProjectUpdate,
 ) -> None:
     """Проверяет сумму, инвестированную в проект при обновлении проекта."""
-    if (project_request.full_amount is not None
-            and project.invested_amount > project_request.full_amount):
+    if (project_request.full_amount is not None and
+            project.invested_amount > project_request.full_amount):
         raise HTTPException(
             status_code=HTTPStatus.UNPROCESSABLE_ENTITY,
             detail='Нельзя установить сумму, ниже уже вложенной!'
