@@ -4,7 +4,8 @@ from typing import List
 from fastapi import APIRouter, Depends, HTTPException
 from sqlalchemy.ext.asyncio import AsyncSession
 
-from app.api.validators import check_charity_project_exists, check_name_duplicate, delete_charity_project
+from app.api.validators import check_charity_project_exists, check_name_duplicate, delete_charity_project, \
+    check_charity_project_close, check_invested_before_edit
 from app.core.db import get_async_session
 from app.core.user import current_superuser
 from app.crud.charity_project import charity_project_crud
@@ -84,7 +85,6 @@ async def delete_charity_projects(
     '/{charity_project_id}',
     response_model=CharityProjectDB,
     dependencies=[Depends(current_superuser)],
-    response_model_exclude_none=True
 )
 async def update_charity_project(
         charity_project_id: int,
@@ -100,6 +100,13 @@ async def update_charity_project(
             obj_in.name,
             session
         )
+    await check_charity_project_close(
+        charity_project
+    )
+    await check_invested_before_edit(
+        charity_project,
+        obj_in
+    )
     charity_project_update = await charity_project_crud.update(
         charity_project,
         obj_in,

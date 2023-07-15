@@ -12,13 +12,14 @@ async def check_name_duplicate(
         charity_project_name: str,
         session: AsyncSession
 ) -> None:
+    """Проверка наличия дублирующихся имён."""
     charity_id = await charity_project_crud.get_charity_project_by_id(
         charity_project_name,
         session
     )
     if charity_id is not None:
         raise HTTPException(
-            status_code=400,
+            status_code=HTTPStatus.BAD_REQUEST,
             detail='Проект с таким именем уже существует!'
         )
 
@@ -44,28 +45,13 @@ async def check_charity_project_exists(
 
 async def check_project_close(
         project: CharityProject
-):
+) -> None:
+    """Проверка проекта на состояние: закрыт."""
     if project.fully_invested:
         raise HTTPException(
             status_code=HTTPStatus.UNPROCESSABLE_ENTITY,
             detail='Удаление закрытых проектов - запрещено!'
         )
-
-
-async def check_charity_before_edit(
-        charity_project_id: int,
-        session: AsyncSession
-) -> CharityProject:
-    charity_project = await charity_project_crud.get(
-        charity_project_id,
-        session
-    )
-    if charity_project is None:
-        raise HTTPException(
-            status_code=HTTPStatus.UNPROCESSABLE_ENTITY,
-            detail='Не найден проект!'
-        )
-    return charity_project
 
 
 async def check_charity_project_close(
@@ -74,7 +60,7 @@ async def check_charity_project_close(
     """Проверяет, закрыт проект или нет."""
     if project.fully_invested:
         raise HTTPException(
-            status_code=400,
+            status_code=HTTPStatus.BAD_REQUEST,
             detail='Закрытый проект нельзя редактировать!'
         )
 
@@ -100,7 +86,7 @@ async def check_invested_before_delete(
     """Проверяет сумму, инвестированную в проект при удалении проекта."""
     if project.invested_amount != 0:
         raise HTTPException(
-            status_code=400,
+            status_code=HTTPStatus.BAD_REQUEST,
             detail='В проект были внесены средства, не подлежит удалению!'
         )
 
@@ -113,12 +99,12 @@ async def delete_charity_project(
     await check_charity_project_close(project)
 
 
-async def update_charity_project(
-    project: CharityProject,
-    project_request: CharityProjectUpdate,
-    session: AsyncSession,
-) -> None:
-    """Валидаторы для проверки проекта перед обновлением."""
-    await check_charity_project_close(project)
-    await check_name_duplicate(project_request, session)
-    await check_invested_before_edit(project, project_request)
+# async def update_charity_project(
+#     project: CharityProject,
+#     project_request: CharityProjectUpdate,
+#     session: AsyncSession,
+# ) -> None:
+#     """Валидаторы для проверки проекта перед обновлением."""
+#     await check_charity_project_close(project)
+#     await check_name_duplicate(project_request, session)
+#     await check_invested_before_edit(project, project_request)
