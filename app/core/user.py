@@ -16,7 +16,9 @@ from app.models.user import User
 from app.schemas.user import UserCreate
 
 
-async def get_user_db(session: AsyncSession = Depends(get_async_session)):
+async def get_user_db(
+        session: AsyncSession = Depends(get_async_session)
+) -> None:
     yield SQLAlchemyUserDatabase(session, User)  # noqa
 
 
@@ -53,7 +55,9 @@ class UserManager(IntegerIDMixin, BaseUserManager[User, int]):
             )
 
 
-async def get_user_manager(user_db=Depends(get_user_db)):
+async def get_user_manager(
+        user_db=Depends(get_user_db)
+) -> None:
     yield UserManager(user_db)
 
 

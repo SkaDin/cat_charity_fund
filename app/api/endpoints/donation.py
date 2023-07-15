@@ -1,4 +1,3 @@
-from http import HTTPStatus
 from typing import List
 
 from fastapi import APIRouter, Depends
@@ -24,7 +23,11 @@ async def create_donation(
         session: AsyncSession = Depends(get_async_session),
         user: User = Depends(current_user),
 
-):
+) -> DonationUserDB:
+    """
+    Только для зарегистрированных пользователей.
+    Создаёт пожервтование.
+    """
     new_donation = await donation_crud.create(
         donation,
         session,
@@ -32,7 +35,7 @@ async def create_donation(
     )
     await investment(
         new_donation,
-        CharityProject,
+        CharityProject,  # noqa
         session
     )
     return new_donation
@@ -46,7 +49,11 @@ async def create_donation(
 )
 async def get_all_donation(
         session: AsyncSession = Depends(get_async_session)
-):
+) -> List[DonationSuperuserDB]:
+    """
+    Только для суперюзеров.
+    Возвращает все сделанные донаты.
+    """
     donations = await donation_crud.get_multi(
         session
     )
@@ -60,7 +67,11 @@ async def get_all_donation(
 async def get_my_donations(
         session: AsyncSession = Depends(get_async_session),
         user: User = Depends(current_user)
-):
+) -> List[DonationUserDB]:
+    """
+    Только для зарегистрированных пользователей.
+    Возвращает донаты конкретного пользователя.
+    """
     donation = await donation_crud.get_by_user(
         user,
         session

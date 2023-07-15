@@ -1,5 +1,5 @@
 from datetime import datetime
-from typing import Union
+from typing import Union, Tuple
 
 from sqlalchemy import select
 from sqlalchemy.ext.asyncio import AsyncSession
@@ -7,7 +7,7 @@ from sqlalchemy.ext.asyncio import AsyncSession
 from app.models import CharityProject, Donation
 
 
-def close(
+async def close(
         obj: Union[CharityProject, Donation]
 ) -> Union[CharityProject, Donation]:
     """Закрывает объект и добавляет дату закрытия."""
@@ -17,10 +17,10 @@ def close(
     return obj
 
 
-def reinvestment(
+async def reinvestment(
         new_obj: Union[CharityProject, Donation],
         open_obj: Union[CharityProject, Donation],
-):
+) -> Tuple[Union[CharityProject, Donation], Union[CharityProject, Donation]]:
     """Перераспределяет средства между проектами и пожертвованиями."""
     # Вычисляем оставшуюся сумму, которую нужно вложить в новый проект.
     to_close_new_obj = new_obj.full_amount - new_obj.invested_amount
@@ -49,16 +49,16 @@ async def investment(
 ) -> None:
     """Инвестирование или переинвестирование объекта `new_obj`."""
     all_open_obj = await session.execute(
-        select(model).where(model.fully_invested == False)
+        select(model).where(model.fully_invested == False)  # noqa
     )
     all_open_obj = all_open_obj.scalars().all()
     for open_obj in all_open_obj:
-        new_obj, open_obj = reinvestment(new_obj, open_obj)
+        new_obj, open_obj = await reinvestment(new_obj, open_obj)
         if open_obj.invested_amount == open_obj.full_amount:
-            open_obj = close(open_obj)
+            open_obj = await close(open_obj)
         session.add(open_obj)
         if new_obj.invested_amount == new_obj.full_amount:
-            new_obj = close(new_obj)
+            new_obj = await close(new_obj)
             break
     session.add(new_obj)
     await session.commit()

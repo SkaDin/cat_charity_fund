@@ -1,6 +1,6 @@
 from sqlalchemy import Column, ForeignKey, Text, Integer
 
-from app.core.db import AbstractBase
+from app.models.base import AbstractBase
 
 
 class Donation(AbstractBase):

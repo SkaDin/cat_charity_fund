@@ -84,27 +84,8 @@ async def check_invested_before_delete(
     project: CharityProject,
 ) -> None:
     """Проверяет сумму, инвестированную в проект при удалении проекта."""
-    if project.invested_amount != 0:
+    if project.invested_amount:
         raise HTTPException(
             status_code=HTTPStatus.BAD_REQUEST,
             detail='В проект были внесены средства, не подлежит удалению!'
         )
-
-
-async def delete_charity_project(
-    project: CharityProject,
-) -> None:
-    """Валидаторы для проверки проекта перед удалением."""
-    await check_invested_before_delete(project)
-    await check_charity_project_close(project)
-
-
-# async def update_charity_project(
-#     project: CharityProject,
-#     project_request: CharityProjectUpdate,
-#     session: AsyncSession,
-# ) -> None:
-#     """Валидаторы для проверки проекта перед обновлением."""
-#     await check_charity_project_close(project)
-#     await check_name_duplicate(project_request, session)
-#     await check_invested_before_edit(project, project_request)

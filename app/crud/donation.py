@@ -1,4 +1,4 @@
-from typing import Optional
+from typing import Optional, Union, Dict
 
 from sqlalchemy import select
 from sqlalchemy.ext.asyncio import AsyncSession
@@ -23,10 +23,11 @@ class CRUDDonation(CRUDBase):
 
     async def create(
             self,
-            obj_in,
+            obj_in: Union[Donation, Dict],
             session: AsyncSession,
             user: Optional[User] = None
-    ):
+    ) -> Union[Donation]:
+        """Переписывает базовый метод."""
         obj_in_data = obj_in.dict()
         obj_in_data['user_id'] = user.id
         db_obj = self.model(**obj_in_data)
