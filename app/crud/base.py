@@ -1,13 +1,10 @@
-from typing import List, Union, TypeVar
+from typing import List, Union
 
 from fastapi.encoders import jsonable_encoder
 from sqlalchemy import select
 from sqlalchemy.ext.asyncio import AsyncSession
 
 from app.models import CharityProject, Donation
-
-
-ModelType = TypeVar('ModelType', CharityProject, Donation)
 
 
 class CRUDBase:
@@ -52,7 +49,7 @@ class CRUDBase:
 
     @staticmethod
     async def update(
-            db_obj: ModelType,
+            db_obj: Union[CharityProject, Donation],
             obj_in: Union[CharityProject, Donation],
             session: AsyncSession,
     ) -> Union[CharityProject, Donation]:
@@ -69,7 +66,7 @@ class CRUDBase:
 
     @staticmethod
     async def remove(
-            db_obj: ModelType,
+            db_obj: Union[CharityProject, Donation],
             session: AsyncSession,
     ) -> Union[CharityProject, Donation]:
         """Удаление объекта."""
