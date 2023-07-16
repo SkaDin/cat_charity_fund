@@ -30,7 +30,7 @@ class CharityProjectCreate(CharityProjectBase):
     pass
 
 
-class CharityProjectUpdate(BaseModel):
+class CharityProjectUpdate(CharityProjectBase):
     """Схема редактирования проектов."""
     name: Optional[str] = Field(
         None,

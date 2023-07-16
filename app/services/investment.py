@@ -4,6 +4,7 @@ from typing import Union, Tuple
 from sqlalchemy import select
 from sqlalchemy.ext.asyncio import AsyncSession
 
+from app.constants import TWO_MODEL_UNION
 from app.models import CharityProject, Donation
 
 
@@ -18,9 +19,9 @@ async def close(
 
 
 async def reinvestment(
-        new_obj: Union[CharityProject, Donation],
-        open_obj: Union[CharityProject, Donation],
-) -> Tuple[Union[CharityProject, Donation], Union[CharityProject, Donation]]:
+        new_obj: TWO_MODEL_UNION,
+        open_obj: TWO_MODEL_UNION,
+) -> Tuple[TWO_MODEL_UNION, TWO_MODEL_UNION]:
     """Перераспределяет средства между проектами и пожертвованиями."""
     # Вычисляем оставшуюся сумму, которую нужно вложить в новый проект.
     to_close_new_obj = new_obj.full_amount - new_obj.invested_amount
@@ -43,8 +44,8 @@ async def reinvestment(
 
 
 async def investment(
-        new_obj: Union[CharityProject, Donation],
-        model: Union[CharityProject, Donation],
+        new_obj: TWO_MODEL_UNION,
+        model: TWO_MODEL_UNION,
         session: AsyncSession,
 ) -> None:
     """Инвестирование или переинвестирование объекта `new_obj`."""

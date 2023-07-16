@@ -4,6 +4,7 @@ from fastapi.encoders import jsonable_encoder
 from sqlalchemy import select
 from sqlalchemy.ext.asyncio import AsyncSession
 
+from app.constants import TWO_MODEL_UNION
 from app.models import CharityProject, Donation
 
 
@@ -17,7 +18,7 @@ class CRUDBase:
             self,
             obj_id: int,
             session: AsyncSession,
-    ) -> Union[CharityProject, Donation]:
+    ) -> TWO_MODEL_UNION:
         """Получение объекта."""
         get_obj_in_db = await session.execute(
             select(self.model).where(
@@ -29,7 +30,7 @@ class CRUDBase:
     async def get_multi(
             self,
             session: AsyncSession
-    ) -> List[Union[CharityProject, Donation]]:
+    ) -> List[TWO_MODEL_UNION]:
         """Получение всех объектов."""
         db_obj_all = await session.execute(select(self.model))
         return db_obj_all.scalars().all()
@@ -38,7 +39,7 @@ class CRUDBase:
             self,
             obj_in: Union[CharityProject, Donation],
             session: AsyncSession
-    ) -> Union[CharityProject, Donation]:
+    ) -> TWO_MODEL_UNION:
         """Создание объекта."""
         obj_in_data = jsonable_encoder(obj_in)
         db_obj = self.model(**obj_in_data)
@@ -52,7 +53,7 @@ class CRUDBase:
             db_obj: Union[CharityProject, Donation],
             obj_in: Union[CharityProject, Donation],
             session: AsyncSession,
-    ) -> Union[CharityProject, Donation]:
+    ) -> TWO_MODEL_UNION:
         """Обновление объекта."""
         obj_data = jsonable_encoder(db_obj)
         update_data = obj_in.dict(exclude_unset=True)
@@ -68,7 +69,7 @@ class CRUDBase:
     async def remove(
             db_obj: Union[CharityProject, Donation],
             session: AsyncSession,
-    ) -> Union[CharityProject, Donation]:
+    ) -> TWO_MODEL_UNION:
         """Удаление объекта."""
         await session.delete(db_obj)
         await session.commit()

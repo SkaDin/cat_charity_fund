@@ -1,4 +1,4 @@
-from typing import Optional, Union, Dict
+from typing import Optional, Union, Dict, List
 
 from sqlalchemy import select
 from sqlalchemy.ext.asyncio import AsyncSession
@@ -13,7 +13,7 @@ class CRUDDonation(CRUDBase):
     async def get_by_user(
             user: User,
             session: AsyncSession
-    ):
+    ) -> List[Donation]:
         donation_all = await session.execute(
             select(Donation).where(
                 Donation.user_id == user.id
